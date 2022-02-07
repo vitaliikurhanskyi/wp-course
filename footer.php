@@ -1,4 +1,4 @@
-<div class="modal">
+    <div class="modal">
       <div class="wrapper">
         <section class="modal-content modal-form" id="modal-form">
           <button class="modal__closer">
@@ -25,6 +25,7 @@
         </section>
       </div>
     </div>
+
     <div class="footer">
       <header class="main-header">
         <div class="wrapper main-header__wrap">
@@ -112,6 +113,8 @@
         </div>
       </footer>
     </div>
+
     <?php wp_footer(); ?>
+
   </body>
 </html>

@@ -1,0 +1,9 @@
+.requisition_new {
+	color:  blue;
+}
+.requisition_done {
+	color: green;
+}
+.requisition_processing {
+	color: orange;
+}

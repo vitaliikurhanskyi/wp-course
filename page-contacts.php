@@ -30,9 +30,9 @@
             ?>
           </p>
 
-          <?php the_content(); ?>
 
-          <form action="#" class="contacts__form contacts-form">
+
+          <!-- <form action="#" class="contacts__form contacts-form">
             <label class="contacts-form__label">
               <span class="sr-only"> Имя </span>
               <input type="text" class="contacts-form__input" placeholder="Ваше имя">
@@ -50,7 +50,9 @@
               <textarea name="" id="" cols="30" rows="10" class="contacts-form__textarea" placeholder="Ваше сообщение"></textarea>
             </label>
             <button class="contacts-form__btn btn"> Отправить </button>
-          </form>
+          </form> -->
+
+
           <?php the_content(); ?>
         </div>
         <?php 

@@ -529,19 +529,6 @@ function si_option_slogan_cb($args) {
 }
 
 
-/* Работаем с формой карточки на сайте admin-post.php */
-
-/* Не зарегистрированый пользователь */
-add_action('admin_post_nopriv_si-modal-form', 'si_modal_form_handler');
-/* Зарегистрированый пользователь */
-add_action('admin_post_si-modal-form', 'si_modal_form_handler');
-
-function si_modal_form_handler() {
-    //var_dump($_POST);
-    header('Location:' . home_url());
-
-}
-
 
 /* ajax для лайков */
 add_action('wp_ajax_nopriv_post-likes', 'si_likes');
@@ -639,7 +626,7 @@ function si_meta_boxes2() {
     $fields = [
         'si_order_date' => 'Дата заявки ',
         'si_order_name' => 'Имя клиента ',
-        'si_order_phone' => 'омер телефона ',
+        'si_order_phone' => 'Номер телефона ',
         'si_order_choice' => 'Выбор клиента '
     ];
 
@@ -658,11 +645,112 @@ function si_meta_boxes2() {
 }
 
 function si_order_fields_cb($post_obj, $key) {
-    $slug = $key['args'];
-    $field = get_post_meta($post_obj->ID, $slug, true);
-    $field = $field ? $field : 'Нет данных';
-    echo '<span>' . $field . '</span>';
+    $slug  = $key['args'];
+    //var_dump($slug);
+    $field  = '';
+    switch($slug) {
+        case 'si_order_date':
+            // $format = 'n-j-Y';
+            // $field = get_the_date($format, $post_obj->ID);
+            // $field = $field ? $field : 'Время не установленно!!!';
+            $field = $post_obj->post_date;
+        break;
+        case 'si_order_choice':
+            $id    = get_post_meta($post_obj->ID, $slug, true);
+            $title = get_the_title($id);
+            $type  = get_post_type_object(get_post_type($id))->labels->singular_name;
+            $field = 'Клиен выбрал: <strong>' . $title . '</strong>. <br>Из раздела: <strong>' . $type . '</strong>';
+        break;
+        default:
+            $field = get_post_meta($post_obj->ID, $slug, true);
+            $field = $field ? $field : 'Нет данных';
+        break;
+    }
+    echo '<p>' . $field . '</p>';
 }
+
+/* Работаем с формой */
+
+/* Не зарегистрированый пользователь */
+add_action('admin_post_nopriv_si-modal-form', 'si_modal_form_handler');
+/* Зарегистрированый пользователь */
+add_action('admin_post_si-modal-form', 'si_modal_form_handler');
+
+function si_modal_form_handler() {
+    $name = $_POST['si-user-name'] ? $_POST['si-user-name'] : 'Аноним';
+    $phone = $_POST['si-user-phone'] ? $_POST['si-user-phone'] : false;
+    $id = $_POST['form-post-id'] ? $_POST['form-post-id'] : 'empty';
+    if($phone) {
+        $name   = wp_strip_all_tags($name);
+        $phone  = wp_strip_all_tags($phone);
+        $choice = wp_strip_all_tags($id);
+        $id     = wp_insert_post(wp_slash([
+            'post_title' => 'Заявка № ',
+            'post_type' => 'orders',
+            'post_status' => 'publish',
+            'meta_input' => [
+                'si_order_name' => $name,
+                'si_order_phone' => $phone,
+                'si_order_choice' => $choice
+            ]
+        ]));
+        if($id !== 0){
+            wp_update_post([
+                'ID' => $id,
+                'post_title' => 'Заявка № ' . $id
+            ]);
+            update_field('orders_status', 'new', $id);
+            //wp_mail(); на почту
+        }
+    }
+    header('Location:' . home_url());
+}
+
+add_filter('manage_orders_posts_columns', 'orders_columns_callback_function');
+
+function orders_columns_callback_function($columns) {
+    $my_columns = [
+        'id' => 'ID',
+        'title' => 'Заявка',
+        'orders_status' => 'Статус заявки'
+    ];
+    return array_slice( $columns, 0, 1 ) + $my_columns + $columns;
+}
+
+add_action('manage_orders_posts_custom_column', 'manage_orders_posts_custom_column_callback_function', 10, 2);
+function manage_orders_posts_custom_column_callback_function($column, $post_id) {
+    switch($column){
+        case 'orders_status' :
+            //var_dump(get_field('orders_status', $post_id));
+            $requisition = get_field('orders_status', $post_id);
+            switch($requisition['value']) {
+                case 'new' :
+                    $class = $requisition['value'];
+                    $label = $requisition['label'];
+                    echo "<div class=\"requisition_$class\">$label</div>";
+                break;
+                case 'done' :
+                    $class = $requisition['value'];
+                    $label = $requisition['label'];
+                    echo "<div class=\"requisition_$class\">$label</div>";
+                break;
+                case 'processing' :
+                    $class = $requisition['value'];
+                    $label = $requisition['label'];
+                    echo "<div class=\"requisition_$class\">$label</div>";
+                break;
+            }
+            //var_dump($requisition);
+        break;
+    }
+}
+
+// Подключаем скрипты в админку
+add_action( 'admin_enqueue_scripts', function(){
+    wp_enqueue_style( 'my-wp-admin', get_template_directory_uri() .'/css/wp-admin.css' );
+}, 99 );
+
+
 
 
 
