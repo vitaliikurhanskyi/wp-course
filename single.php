@@ -15,8 +15,26 @@
 
       <article class="main-article wrapper">
         <header class="main-article__header">
+          <?php
+            if(get_field('post_si_thumb')) {
+              $custom_thumb = get_field('post_si_thumb');
+              if($custom_thumb){
+                $url = $custom_thumb['url'];
+                $alt = $custom_thumb['alt'];
+                //echo "<img src=\"$url\" alt=\"$alt\" class=\"main-article__thumb\">";
+                //print_r($custom_thumb);
+          ?>
+            <picture>
+              <source srcset="<?php echo $custom_thumb['sizes']['si_pic']; ?>" media="(max-width: 600px)" class="minipic">
+              <img src="<?php echo $url; ?>" alt="<?php echo $alt; ?>" class="main-article__thumb">
+            </picture>
 
-          <?php the_post_thumbnail('full', ['class' => 'main-article__thumb']) ?>
+          <?php
+              }
+            } else {
+              the_post_thumbnail('post-thumbnail', ['class' => 'main-article__thumb']);
+            }
+          ?>
 
           <h1 class="main-article__h"><?php the_title(); ?></h1>
         </header>

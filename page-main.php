@@ -110,6 +110,7 @@ Template Name: Шаблон главной страницы
         <div class="wrapper">
           <h2 class="main-heading cards__h"> клубные карты </h2>
           <ul class="cards__list row">
+
           <?php 
             while($query->have_posts()) :
               $query->the_post();
@@ -143,7 +144,7 @@ Template Name: Шаблон главной страницы
           ?>  
           </ul>
         </div>
-      </section>
+      </section> <!-- cards -->
       <?php
         endif;
       ?>

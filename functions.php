@@ -14,6 +14,16 @@ function si_meta_boxes() {
     );
 }
 
+/* очистить шапку */
+
+remove_action('wp_head','feed_links_extra', 3); // убирает ссылки на rss категорий
+remove_action('wp_head','feed_links', 2); // минус ссылки на основной rss и комментарии
+remove_action('wp_head','rsd_link');  // сервис Really Simple Discovery
+remove_action('wp_head','wlwmanifest_link'); // Windows Live Writer
+remove_action('wp_head','wp_generator');
+
+/* end очистить шапку */
+
 function si_meta_like_cb( $post_obj ) {
     $likes = get_post_meta($post_obj->ID, 'si-like', true);
     $likes = $likes ? $likes : 0;
@@ -129,7 +139,8 @@ function si_register_types() {
         //'menu_icon'           => 'dashicons-smiley',
         'menu_icon'           => 'dashicons-media-text',  
         'hierarchical'        => false,
-        'supports'            => ['title'], // 'editor', 'thumbnail'
+        'show_in_rest'        => true,
+        'supports'            => ['title', 'editor'], // 'editor', 'thumbnail'
         'has_archive' => true
     ]);
 
@@ -312,6 +323,14 @@ function si_scripts() {
         '1.0',
         'all'
     );
+    //отключаем скрипты
+    //wp_dequeue_style('wp-block-library');
+    //wp_dequeue_style('wp-embed');
+
+    //отключаем jQuery старой версии
+    // if ( !is_admin() ) {
+    //     wp_deregister_script('jquery');
+    // }
 }
 
 /* включить выбор логотипа, иконки и тамбнейла в теме */
@@ -328,6 +347,12 @@ function si_setup() {
     add_theme_support('title-tag');
     add_theme_support('post-thumbnails');
     //add_theme_support('menus');
+
+    //картинки размер
+
+    add_image_size('si_pic', 600, 240, true);
+
+
 }
 /* включить выбор логотипа, иконки и тамбнейла в теме */
 
